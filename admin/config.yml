@@ -1,0 +1,103 @@
+# Pannello redazionale (Decap CMS) per festadelporcino.it
+# Si apre su https://festadelporcino.it/admin/ e scrive direttamente in data/attivita.json.
+# Richiede Netlify Identity + Git Gateway attivi sul sito (vedi README).
+
+backend:
+  name: git-gateway
+  branch: main
+
+locale: it
+media_folder: "assets/copertine"
+public_folder: "assets/copertine"
+
+collections:
+  - name: "contenuti"
+    label: "Contenuti"
+    files:
+      - name: "attivita"
+        label: "Attività ed esperienze"
+        file: "data/attivita.json"
+        format: "json"
+        fields:
+          - name: "attivita"
+            label: "Attività"
+            label_singular: "attività"
+            widget: "list"
+            summary: "{{fields.titolo}} ({{fields.tipo}}, {{fields.stato}})"
+            fields:
+              - { name: "id", label: "ID univoco (es. att-008)", widget: "string" }
+              - name: "tipo"
+                label: "Tipo"
+                widget: "select"
+                default: "esperienza"
+                options:
+                  - { label: "Esperienza (pagina propria e card nel catalogo)", value: "esperienza" }
+                  - { label: "Solo programma (es. apertura stand, musica)", value: "programma" }
+              - { name: "evidenza", label: "In evidenza nel programma", widget: "boolean", default: false, required: false }
+              - { name: "a_cura_di", label: "A cura di", widget: "string", required: false }
+              - { name: "dettaglio", label: "Dettaglio nel programma (sostituisce «a cura di»)", widget: "string", required: false }
+              - { name: "pubblica", label: "Pubblicata sul sito", widget: "boolean", default: true }
+              - { name: "titolo", label: "Titolo", widget: "string" }
+              - { name: "tipologia", label: "Tipologia (es. Escursione, Laboratorio)", widget: "string", required: false, hint: "Compare in piccolo sopra il titolo nel programma." }
+              - { name: "slug", label: "Indirizzo pagina (lascia vuoto per crearlo dal titolo)", widget: "string", required: false }
+              - { name: "categoria", label: "Categoria", widget: "string", required: false, hint: "Es. Cammini, Gusto, Laboratori, Musica" }
+              - { name: "copertina", label: "Copertina ufficiale 16:9", widget: "image", required: false, hint: "Usa la copertina Eventbrite fornita dall'organizzazione, senza testi aggiunti." }
+              - { name: "copertina_alt", label: "Descrizione della copertina (accessibilità)", widget: "string", required: false }
+              - { name: "in_breve", label: "Da sapere (riga breve nel programma)", widget: "text", required: false }
+              - { name: "descrizione_breve", label: "Descrizione breve (card)", widget: "text", required: false }
+              - { name: "descrizione_completa", label: "Descrizione completa", widget: "text", required: false, hint: "Una riga vuota separa i paragrafi." }
+              - name: "sessioni"
+                label: "Turni"
+                label_singular: "turno"
+                widget: "list"
+                required: false
+                fields:
+                  - { name: "data", label: "Data (AAAA-MM-GG)", widget: "string", pattern: ["^\\d{4}-\\d{2}-\\d{2}$", "Formato AAAA-MM-GG, es. 2026-10-31"] }
+                  - { name: "ora_inizio", label: "Ora di inizio (HH:MM)", widget: "string", required: false }
+                  - { name: "ora_fine", label: "Ora di fine (HH:MM)", widget: "string", required: false }
+                  - { name: "luogo", label: "Luogo del turno (se diverso)", widget: "string", required: false }
+              - { name: "luogo", label: "Luogo", widget: "string", required: false }
+              - { name: "costo", label: "Costo o contributo", widget: "string", required: false }
+              - { name: "indicazioni_titolo", label: "Titolo delle indicazioni (facoltativo)", widget: "string", required: false, hint: "Vuoto = «Indicazioni per chi partecipa»" }
+              - { name: "indicazioni", label: "Indicazioni per i partecipanti", widget: "text", required: false, hint: "Una riga vuota separa i paragrafi; righe che iniziano con * diventano un elenco." }
+              - { name: "eventbrite_url", label: "Link Eventbrite", widget: "string", required: false }
+              - name: "stato"
+                label: "Stato"
+                widget: "select"
+                default: "in-aggiornamento"
+                options:
+                  - { label: "Confermato", value: "confermato" }
+                  - { label: "In aggiornamento", value: "in-aggiornamento" }
+                  - { label: "Prenotazioni aperte", value: "prenotazioni-aperte" }
+                  - { label: "Prenotazioni chiuse", value: "prenotazioni-chiuse" }
+      - name: "festa"
+        label: "Date e informazioni pratiche"
+        file: "data/festa.json"
+        format: "json"
+        fields:
+          - { name: "nome", label: "Nome", widget: "string" }
+          - { name: "luogo", label: "Luogo", widget: "string" }
+          - { name: "sito", label: "Indirizzo del sito", widget: "string" }
+          - { name: "edizione", label: "Edizione (anno)", widget: "string" }
+          - name: "giornate"
+            label: "Giornate"
+            widget: "list"
+            fields:
+              - { name: "data", label: "Data (AAAA-MM-GG)", widget: "string" }
+              - { name: "titolo", label: "Tema della giornata (facoltativo)", widget: "string", required: false }
+          - name: "info_pratiche"
+            label: "Informazioni pratiche"
+            widget: "list"
+            fields:
+              - { name: "titolo", label: "Titolo", widget: "string" }
+              - { name: "testo", label: "Testo (vuoto = da confermare)", widget: "text", required: false }
+          - name: "contatti"
+            label: "Contatti"
+            widget: "object"
+            fields:
+              - { name: "email", label: "Email", widget: "string", required: false }
+              - { name: "telefono", label: "Telefono", widget: "string", required: false }
+              - { name: "instagram", label: "Instagram (URL)", widget: "string", required: false }
+              - { name: "facebook", label: "Facebook (URL)", widget: "string", required: false }
+          - { name: "organizzazione", label: "Organizzazione", widget: "string", required: false }
+          - { name: "nota_programma", label: "Nota in fondo al programma", widget: "string", required: false }
